@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     TextView btn_join;
     Button btn_login;
     EditText edit_email, edit_pwd;
+    CheckBox check_login;
 
     String email, pwd, nikname, user_idx;
 
@@ -45,11 +47,18 @@ public class MainActivity extends AppCompatActivity {
         btn_login = findViewById(R.id.btn_login);
         edit_email = findViewById(R.id.edit_email);
         edit_pwd = findViewById(R.id.edit_pwd);
+        check_login = findViewById(R.id.check_login);
 
         btn_join.setOnClickListener(click);
         btn_login.setOnClickListener(click);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+        if(pref.getString("access","no").equals("ok"))
+        {
+            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
     }//onCreate()
 
@@ -145,11 +154,22 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
             if (s.contains("최근")){
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putString("user_id", email);
-                editor.putString("user_nikname", nikname);
-                editor.putString("user_idx",user_idx);
-                editor.commit();
+
+                if (check_login.isChecked()){
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("user_id", email);
+                    editor.putString("user_nikname", nikname);
+                    editor.putString("user_idx",user_idx);
+                    editor.putString("access","ok");
+                    editor.commit();
+                }else{
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString("user_id", email);
+                    editor.putString("user_nikname", nikname);
+                    editor.putString("user_idx",user_idx);
+                    editor.putString("access","ok");
+                    editor.commit();
+                }
 
                 Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                 startActivity(intent);

@@ -1,37 +1,27 @@
 package infofood.senghan1992.com.infofood;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class Content_tip_activity extends AppCompatActivity {
 
-    LinearLayout tip_img_layout1, tip_img_layout2, tip_img_layout3, tip_img_layout4,
-            tip_txt_layout1, tip_txt_layout2, tip_txt_layout3, tip_txt_layout4;
-    EditText tip_title;
+    LinearLayout tip_layout2, tip_layout3, tip_layout4, tip_layout5;
+    EditText tip_title, tip_content1, tip_content2, tip_content3, tip_content4, tip_content5;
     ImageView tip_img1, tip_img2, tip_img3, tip_img4, tip_img5;
     ImageView tip_nextbtn1, tip_nextbtn2, tip_nextbtn3, tip_nextbtn4;
 
     private static final int CAMERA_REQUEST_CODE  = 1;
-    private static final int CAMERA_REQUEST_CODE22222  = 1;
     private static final int REQ_CODE_SELECT_IMAGE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_content_tip_activity);
+        setContentView(R.layout.activity_content_tip);
 
-        tip_title = findViewById(R.id.tip_title);
+        /*tip_title = findViewById(R.id.tip_title);
 
         tip_nextbtn1 = findViewById(R.id.tip_nextbtn1);
         tip_nextbtn2 = findViewById(R.id.tip_nextbtn2);
@@ -97,10 +87,10 @@ public class Content_tip_activity extends AppCompatActivity {
                 tip_txt_layout4.setVisibility(View.VISIBLE);
                 tip_nextbtn4.setVisibility(View.GONE);
             }
-        });
+        });*/
     }//onCreate()
 
-    View.OnClickListener imgClick = new View.OnClickListener() {
+    /*View.OnClickListener imgClick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             final AlertDialog.Builder dialog1 = new AlertDialog.Builder(Content_tip_activity.this);
@@ -160,5 +150,5 @@ public class Content_tip_activity extends AppCompatActivity {
             Bitmap bitmap = (Bitmap)bundle.get("data");
             tip_img1.setImageBitmap(bitmap);
         }
-    }
+    }*/
 }

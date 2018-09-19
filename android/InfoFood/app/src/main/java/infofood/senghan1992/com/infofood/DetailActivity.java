@@ -38,7 +38,7 @@ public class DetailActivity extends AppCompatActivity {
         detail_content = findViewById(R.id.detail_content);
 
         detail_nikname.setText(nikname);
-        detail_regidate.setText(regidate);
+        detail_regidate.setText(regidate.substring(0,10));
         detail_subway.setText(subway);
         detail_content.setText(content);
         Glide.with(this).load(ServerInfo.SERVER_IP_PHOTO+image).into(detail_image);
