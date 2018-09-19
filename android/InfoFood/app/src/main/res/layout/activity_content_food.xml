@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".Upload2Activity">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#ffa200"
+            android:gravity="center"
+            android:text="InFood"
+            android:textColor="#ffffff"
+            android:textSize="25dp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/camera_icon"
+            android:layout_marginTop="70dp"
+            android:layout_marginLeft="40dp"
+            android:id="@+id/camera_icon"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/gallery_icon"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="140dp"
+            android:id="@+id/gallery_icon"/>
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="65dp"
+            android:layout_marginLeft="150dp"
+            android:background="@drawable/border"
+            android:id="@+id/upload_img"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="근처 지하철역"
+            android:layout_marginTop="230dp"
+            android:layout_marginLeft="20dp"/>
+
+        <EditText
+            android:id="@+id/upload_subway"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="265dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/border"
+            android:textSize="25dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="음식"
+            android:layout_marginTop="300dp"
+            android:layout_marginLeft="20dp"/>
+
+        <EditText
+            android:id="@+id/upload_food"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="335dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/border"
+            android:textSize="25dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="설명 입력"
+            android:layout_marginTop="380dp"
+            android:layout_marginLeft="20dp"/>
+
+        <EditText
+            android:id="@+id/upload_content"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_marginTop="420dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="25dp"
+            android:gravity="top"
+            android:background="@drawable/border"/>
+
+        <Button
+            android:id="@+id/upload_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="업로드"
+            android:textColor="#fff"
+            android:background="#ff9600"/>
+
+    </FrameLayout>
+</ScrollView>
