@@ -33,6 +33,7 @@
                 android:hint="어떤 Tip을 알려주실껀가요?"/>
 
             <LinearLayout
+                android:id="@+id/tip_layout1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -60,12 +61,6 @@
                     android:gravity="center">
 
                     <ImageView
-                        android:id="@+id/tip_cancel1"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@mipmap/minus"/>
-
-                    <ImageView
                         android:id="@+id/tip_nextbtn1"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
@@ -81,7 +76,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/tip_img2"
@@ -104,7 +100,7 @@
                     android:gravity="center">
 
                     <ImageView
-                        android:id="@+id/tip_cancel2"
+                        android:id="@+id/tip_cancel1"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@mipmap/minus"/>
@@ -125,7 +121,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/tip_img3"
@@ -148,7 +145,7 @@
                     android:gravity="center">
 
                     <ImageView
-                        android:id="@+id/tip_cancel3"
+                        android:id="@+id/tip_cancel2"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@mipmap/minus"/>
@@ -169,7 +166,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/tip_img4"
@@ -192,7 +190,7 @@
                     android:gravity="center">
 
                     <ImageView
-                        android:id="@+id/tip_cancel5"
+                        android:id="@+id/tip_cancel3"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@mipmap/minus"/>
@@ -213,7 +211,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="10dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:visibility="gone"
+                >
 
                 <ImageView
                     android:id="@+id/tip_img5"
@@ -236,7 +236,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/tip_nextbtn5"
+                        android:id="@+id/tip_cancel4"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@mipmap/minus"/>
@@ -248,7 +248,10 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="업로드"/>
+                android:text="업로드"
+                android:textColor="#fff"
+                android:background="#ff9600"
+                android:layout_gravity="bottom"/>
 
         </LinearLayout>
 
