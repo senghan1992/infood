@@ -22,19 +22,22 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".JoinActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.JoinActivity" />
+        <activity android:name=".activities.MainActivity">
+
+        </activity>
+        <activity android:name=".activities.LoginActivity" />
+        <activity android:name=".activities.HomeActivity" />
+        <activity android:name=".activities.Content_tip_activity" />
+        <activity android:name=".activities.Content_food_activity" />
+        <activity android:name=".activities.DetailActivity" />
+        <activity android:name=".TestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".HomeActivity"></activity>
-        <activity android:name=".Content_tip_activity" />
-        <activity android:name=".Content_food_activity" />
-        <activity android:name=".DetailActivity"></activity>
     </application>
 
 </manifest>

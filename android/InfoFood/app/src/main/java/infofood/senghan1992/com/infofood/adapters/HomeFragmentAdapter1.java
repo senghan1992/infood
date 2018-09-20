@@ -15,7 +15,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import infofood.senghan1992.com.infofood.DetailActivity;
+import infofood.senghan1992.com.infofood.activities.DetailActivity;
 import infofood.senghan1992.com.infofood.R;
 import infofood.senghan1992.com.infofood.ServerInfo.ServerInfo;
 import infofood.senghan1992.com.infofood.vo.FoodVO;
