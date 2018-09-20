@@ -40,7 +40,6 @@ public class Content_tip_activity extends AppCompatActivity {
         count = 0;
 
         //검색
-
         //content 하나당 레이아웃
         layouts = new LinearLayout[5];
         layouts[0] = findViewById(R.id.tip_layout1);
@@ -180,7 +179,6 @@ public class Content_tip_activity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
-
     }//takePhoto()
 
     private void selectAlbum() {
