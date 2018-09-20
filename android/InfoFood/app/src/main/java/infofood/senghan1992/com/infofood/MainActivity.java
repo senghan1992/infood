@@ -167,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString("user_id", email);
                     editor.putString("user_nikname", nikname);
                     editor.putString("user_idx",user_idx);
-                    editor.putString("access","ok");
                     editor.commit();
                 }
 

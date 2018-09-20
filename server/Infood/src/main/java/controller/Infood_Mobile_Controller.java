@@ -170,5 +170,12 @@ public class Infood_Mobile_Controller {
 
 		return resultStr;
 	}
+	
+	@RequestMapping("/mobile/upload_tip")
+	@ResponseBody
+	public String upload_content_tip() {
+		
+		return "";
+	}
 
 }

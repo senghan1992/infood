@@ -205,6 +205,8 @@ public class Content_tip_activity extends AppCompatActivity {
                 tip_test.setImageBitmap(bitmap);
             }
         }
-    }
+    }//onActivityResult()
+
+    
 
 }
