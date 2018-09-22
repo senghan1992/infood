@@ -12,17 +12,13 @@ public class NetRetrofit {
     public static NetRetrofit getInstance(){
         return ourInstance;
     }
-    private NetRetrofit(){
-
-    }
-
     Gson gson = new GsonBuilder()
             .setLenient()
             .create();
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(ServerInfo.SERVER_IP)
-            .addConverterFactory(GsonConverterFactory.create(gson)) //파싱 등록
+            .addConverterFactory(GsonConverterFactory.create(gson )) //파싱 등록
             .build();
 
     RetrofitService service = retrofit.create(RetrofitService.class);
