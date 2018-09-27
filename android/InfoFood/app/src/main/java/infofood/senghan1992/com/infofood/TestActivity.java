@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import infofood.senghan1992.com.infofood.utils.NetRetrofit;
 import retrofit2.Call;
@@ -47,17 +47,17 @@ public class TestActivity extends AppCompatActivity {
         String pwd = test_edit2.getText().toString();
 
         if (!id.isEmpty()) {
-            Call<JsonArray> res = NetRetrofit.getInstance()
-                    .getService().home();
-            res.enqueue(new Callback<JsonArray>() {
+            Call<JsonObject> res = NetRetrofit.getInstance()
+                    .getService().login(id,pwd);
+            res.enqueue(new Callback<JsonObject>() {
                 @Override
-                public void onResponse(Call<JsonArray> call, Response<JsonArray> response) {
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     Log.d("Retrofit", response.toString());
                     test_txt.setText(response.body().toString());
                 }
 
                 @Override
-                public void onFailure(Call<JsonArray> call, Throwable t) {
+                public void onFailure(Call<JsonObject> call, Throwable t) {
                     Log.e("Err", t.getMessage());
                 }
             });

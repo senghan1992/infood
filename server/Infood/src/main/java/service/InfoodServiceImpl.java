@@ -125,15 +125,15 @@ public class InfoodServiceImpl implements InfoodService {
 		}
 
 		MultipartHttpServletRequest request = (MultipartHttpServletRequest) map.get("request");
-		Iterator<String> iter = request.getFileNames();
-		while (iter.hasNext()) {
-			String uploadFileName = iter.next();
-			MultipartFile mFile = request.getFile(uploadFileName);
-			String originalFileName = mFile.getOriginalFilename();
+		MultipartFile test = request.getFile("file");
+		if(test == null) {
+			System.out.println("null");
+		}else {
+			String originalFileName = test.getOriginalFilename();
 			saveFileName = originalFileName;
 			if (saveFileName != null && !saveFileName.equals("")) {
 				try {
-					mFile.transferTo(new File(savePath + saveFileName));
+					test.transferTo(new File(savePath + saveFileName));
 					isSuccess = true;
 				} catch (IllegalStateException e) {
 					e.printStackTrace();
@@ -142,16 +142,15 @@ public class InfoodServiceImpl implements InfoodService {
 					e.printStackTrace();
 					isSuccess = false;
 				}
-
-			} // if end
-
-		} // while end
-		
+			}
+		}
 		subway = request.getParameter("subway");
 		content = request.getParameter("content");
 		food = request.getParameter("food");
 		user_idx = request.getParameter("user_idx");
+		user_idx = user_idx.replace("\"", "");
 		user_nikname = request.getParameter("user_nikname");
+		user_nikname = user_nikname.replace("\"", "");
 		
 		int userIdx = Integer.parseInt(user_idx);
 		

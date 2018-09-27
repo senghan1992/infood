@@ -3,17 +3,31 @@ package infofood.senghan1992.com.infofood.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import infofood.senghan1992.com.infofood.R;
+import infofood.senghan1992.com.infofood.vo.TipVO;
 
 public class Content_tip_activity extends AppCompatActivity {
 
@@ -34,12 +48,22 @@ public class Content_tip_activity extends AppCompatActivity {
     //***클릭할때마다 변화를 주는 제일 중요한 변수****
     int count;
 
+    //사진 다루는 변수
+    String imageFilePath;
+    Uri photoURI;
+    ArrayList<String> content_tips;
+    ArrayList<TipVO> contentInfo;
+    TipVO vo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_tip);
 
+        //사진들 및 팁에 대한 내용들 담을 리스트 초기화
         count = 0;
+        content_tips = new ArrayList<>();
+        contentInfo = new ArrayList<>();
 
         //검색
         //content 하나당 레이아웃
@@ -108,9 +132,16 @@ public class Content_tip_activity extends AppCompatActivity {
     View.OnClickListener clickNext = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            tip_nextbtns[count].setVisibility(View.GONE);
-            count += 1;
-            layouts[count].setVisibility(View.VISIBLE);
+            String this_content = contents[count].getText().toString();
+            if(!this_content.isEmpty()){
+                tip_nextbtns[count].setVisibility(View.GONE);
+                content_tips.add(this_content);
+                count += 1;
+                Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
+                layouts[count].setVisibility(View.VISIBLE);
+            }else{
+                Toast.makeText(getApplicationContext(),"팁에 대해 설명 부탁드려요",Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -119,7 +150,9 @@ public class Content_tip_activity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             layouts[count].setVisibility(View.GONE);
+            content_tips.remove(content_tips.size()-1);
             count -= 1;
+            Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
             tip_nextbtns[count].setVisibility(View.VISIBLE);
         }
     };
@@ -128,7 +161,7 @@ public class Content_tip_activity extends AppCompatActivity {
     View.OnClickListener clickImage = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.tip_img1:
                     makeDialog();
                     tip_test = findViewById(R.id.tip_img1);
@@ -177,10 +210,53 @@ public class Content_tip_activity extends AppCompatActivity {
         dialog.show();
     }
 
+    //가져온 사진을 정비해서 넣는다
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,      /* prefix */
+                ".jpg",         /* suffix */
+                storageDir          /* directory */
+        );
+        imageFilePath = image.getAbsolutePath();
+        return image;
+    }
+
+    private int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
+    private Bitmap rotate(Bitmap bitmap, float degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+    /////////////////////////////////////////////////////////
+
     public void takePhoto() {
-        Intent intent = new Intent();
-        intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(this, getPackageName(), photoFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(intent, CAMERA_REQUEST_CODE);
+            }
+        }
     }//takePhoto()
 
     private void selectAlbum() {
@@ -193,22 +269,65 @@ public class Content_tip_activity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == GALLERY_REQUEST_CODE) {
+            vo = new TipVO();
+            if (requestCode == CAMERA_REQUEST_CODE) {
+                Bitmap resized = null;
+                ExifInterface exif = null;
+                int exifOrientation = 0;
+                int exifDegree = 0;
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-                    //배치해놓은 ImageView에 이미지를 넣는다.
-                    tip_test.setImageBitmap(bitmap);
+                    Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
+                    exif = new ExifInterface(imageFilePath);
+                    if (exif != null) {
+                        exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                        exifDegree = exifOrientationToDegrees(exifOrientation);
+                    } else {
+                        exifDegree = 0;
+                    }
+
+                    resized = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
                 } catch (Exception e) {
-                    Log.e("test", e.getMessage());
+                    e.printStackTrace();
                 }
-            } else if (requestCode == CAMERA_REQUEST_CODE) {
-                Bundle bundle = data.getExtras();
-                Bitmap bitmap = (Bitmap) bundle.get("data");
-                tip_test.setImageBitmap(bitmap);
+                tip_test.setImageBitmap(rotate(resized, exifDegree));
+                vo.setPhotoUri(photoURI);
+                vo.setPhotoPath(imageFilePath);
+                contentInfo.add(vo);
+                Toast.makeText(getApplicationContext(),contentInfo.size()+"",Toast.LENGTH_SHORT).show();
+            } else if (requestCode == GALLERY_REQUEST_CODE) {
+                //앨범에서 호출한경우 data는 이전인텐트(사진갤러리)에서 선택한 영역을 가져오게된다.
+                Bitmap resized = null;
+                ExifInterface exif = null;
+                int exifOrientation = 0;
+                int exifDegree = 0;
+                if (data != null) {
+                    photoURI = data.getData();
+                    try {
+                        Cursor c = getContentResolver().query(Uri.parse(photoURI.toString()), null, null, null, null);
+                        c.moveToNext();
+                        imageFilePath = c.getString(c.getColumnIndex(MediaStore.MediaColumns.DATA));
+                        Bitmap bitmap = BitmapFactory.decodeFile(imageFilePath);
+                        exif = new ExifInterface(imageFilePath);
+                        if (exif != null) {
+                            exifOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                            exifDegree = exifOrientationToDegrees(exifOrientation);
+                        } else {
+                            exifDegree = 0;
+                        }
+
+                        resized = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+                    } catch (Exception e) {
+
+                    }
+                    tip_test.setImageBitmap(rotate(resized, exifDegree));
+                    vo.setPhotoUri(photoURI);
+                    vo.setPhotoPath(imageFilePath);
+                    contentInfo.add(vo);
+                    Toast.makeText(getApplicationContext(),contentInfo.size()+"",Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }//onActivityResult()
 
-    
 
 }

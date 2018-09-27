@@ -27,23 +27,21 @@ import android.widget.Toast;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import infofood.senghan1992.com.infofood.R;
-import infofood.senghan1992.com.infofood.ServerInfo.ServerInfo;
+import infofood.senghan1992.com.infofood.utils.NetRetrofit;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Content_food_activity extends AppCompatActivity {
 
@@ -52,7 +50,7 @@ public class Content_food_activity extends AppCompatActivity {
     EditText upload_subway, upload_content, upload_food;
 
     //사진 전송에 필요한 것들
-    private Uri imgUri, photoURI, albumURI;
+    private Uri photoURI;
     private String imageFilePath;
 
     String subway, content, food, user_idx, user_nikname, user_id;
@@ -109,13 +107,15 @@ public class Content_food_activity extends AppCompatActivity {
         upload_btn.setOnClickListener(click);
 
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+        user_id = pref.getString("user_id","user_id");
+        user_idx = pref.getString("user_idx","user_idx");
+        user_nikname = pref.getString("user_nikname","user_nikname");
 
-    }
+    }//onCreate()
 
     View.OnClickListener click = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-
             switch (view.getId()) {
                 case R.id.camera_icon:
                     doTakePhotoAction();
@@ -266,9 +266,44 @@ public class Content_food_activity extends AppCompatActivity {
         }
     }
 
-    class DoFileUpload extends AsyncTask<String, Void, String> {
+    //retrofit2로 업로드 구현
+    private String upload_food(String imageFilePath){
+        File file = new File(imageFilePath);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(photoURI)),file);
+        MultipartBody.Part multipartBody =MultipartBody.Part.createFormData("file",file.getName(),requestFile);
 
-        String serverip = ServerInfo.SERVER_IP + "upload_food";
+        Call<ResponseBody> res = NetRetrofit.getInstance()
+                                .getService()
+                                .upload_food(subway,content,food,user_idx+"",user_nikname, multipartBody);
+
+        res.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                HomeActivity homeActivity = (HomeActivity)HomeActivity.HomeActivity;
+                Intent intent = new Intent(Content_food_activity.this, HomeActivity.class);
+                startActivity(intent);
+                finish();
+                homeActivity.finish();
+
+                Log.d("파일업로드시 돌아오는 값",response.body().toString());
+
+                asyncDialog.dismiss();
+                Toast.makeText(getApplicationContext(),"업로드 성공"
+                        ,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),"업로드하는 도중 오류가 발생하였습니다"
+                        ,Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+        return "";
+    }
+
+    class DoFileUpload extends AsyncTask<String, Void, String> {
 
         @Override
         protected void onPreExecute() {
@@ -280,27 +315,16 @@ public class Content_food_activity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            user_id = pref.getString("user_id","user_id");
-            user_idx = pref.getString("user_idx","user_idx");
-            user_nikname = pref.getString("user_nikname","user_nikname");
-            String result = HttpFileUpload(serverip, "", strings[0]);
-            return result;
+            //String result = HttpFileUpload(serverip, "", strings[0]);
+            upload_food(strings[0]);
+            return "";
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            if(s.equals("yes")){
-                asyncDialog.dismiss();
-                HomeActivity homeActivity = (HomeActivity)HomeActivity.HomeActivity;
-                Intent intent = new Intent(Content_food_activity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
-                homeActivity.finish();
-            }
-        }
     }
 
-    private String HttpFileUpload(String urlString, String params, String fileName) {
+    //retrofit2를 사용하면 필요없는 것들이다
+    ///////////////////////////////////////////////////////////////////////
+    /*private String HttpFileUpload(String urlString, String params, String fileName) {
         String lineEnd = "\r\n";
         String twoHyphens = "--";
         String boundary = "*****";
@@ -393,6 +417,6 @@ public class Content_food_activity extends AppCompatActivity {
             e.printStackTrace();
         }
         return receiveMsg;
-    }
+    }*/
 
 }

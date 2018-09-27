@@ -3,10 +3,9 @@ package infofood.senghan1992.com.infofood.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,17 +13,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import infofood.senghan1992.com.infofood.R;
-import infofood.senghan1992.com.infofood.ServerInfo.ServerInfo;
+import infofood.senghan1992.com.infofood.utils.NetRetrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     CheckBox check_login;
 
     String email, pwd, nikname, user_idx;
+    String loginResult = "";
+    String loginMsg = "";
 
     //로그인 정보 저장하기 위한 SharedPreferences
     SharedPreferences pref;
@@ -81,100 +79,76 @@ public class MainActivity extends AppCompatActivity {
                     }else if(pwd.isEmpty()){
                         Toast.makeText(getApplicationContext(),"비밀번호를 입력하세요",Toast.LENGTH_SHORT).show();
                     }else{
-                        String result = "email="+email+"&pwd="+pwd;
-                        new Task().execute(result);
+                        //String result = "email="+email+"&pwd="+pwd;
+                        new Task().execute(email, pwd);
                     }
                     break;
             }
         }
     };//OnClickListener
 
+    //retrofit을 사용하여 서버에 넘길 것들
+    private void login(final String email, String pwd) {
 
-    class Task extends AsyncTask<String,Void,String> {
+        if (!email.isEmpty() && !pwd.isEmpty()) {
+            Call<JsonObject> res = NetRetrofit.getInstance()
+                    .getService().login(email, pwd);
+            res.enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    JsonArray array = response.body().getAsJsonArray("res");
+                    JsonObject object = (JsonObject) array.get(0);
+                    loginResult = object.get("result").toString();
 
-        String sendMsg, receiveMsg;
-        String serverip = ServerInfo.SERVER_IP + "login";
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try{
-                String str = "";
-                URL url = new URL(serverip);
-
-                //서버연결
-                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                conn.setRequestMethod("POST");
-
-                OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-
-                //서버로 전달할 내용
-                sendMsg = strings[0];
-
-                //서버로 값 전송
-                osw.write(sendMsg);
-                osw.flush();
-
-                //서버로 값 전송이 완료되면 서버에서 처리한 결과를 받는다
-                //getResponseCode() : 200 -> 정상
-                //getResponseCode() : 404,500 -> 비정상
-                if(conn.getResponseCode() == conn.HTTP_OK){
-                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "utf-8");
-                    BufferedReader reader = new BufferedReader(tmp);
-                    StringBuffer buffer = new StringBuffer();
-
-                    while ((str = reader.readLine()) != null){
-                        buffer.append(str);
-                    }
-
-                    //서버에서 넘겨준 JSON 형식의 결과값
-                    receiveMsg = buffer.toString();
-                    JSONArray jarray = new JSONObject(receiveMsg).getJSONArray("res");
-                    JSONObject jObject = jarray.getJSONObject(0);
-                    String result = jObject.optString("result");
-
-                    if(result.equals("success")){
-                        String last_login = jObject.optString("last_login");
-                        nikname = jObject.optString("nikname");
-                        user_idx = jObject.optString("user_idx");
-                        receiveMsg = "최근접속일자 : "+last_login;
-                    }else if(result.equals("none")){
-                        receiveMsg = "등록되지 않은 사용자입니다";
+                    if (loginResult.contains("none")){
+                        loginMsg = "등록되지 않은 사용자입니다";
+                    }else if (loginResult.contains("fail")){
+                        loginMsg = "아이디 혹은 비밀번호를 확인하세요";
                     }else{
-                        receiveMsg = "아이디 혹은 비밀번호 오류입니다";
+                        loginMsg = "최근 접속일자 : "+object.get("last_login").toString();
+                        nikname = object.get("nikname").toString();
+                        user_idx = object.get("user_idx").toString();
                     }
-                    Log.i("돌아온 값", receiveMsg);
+
+                    Toast.makeText(getApplicationContext(),loginMsg,Toast.LENGTH_SHORT).show();
+
+                    if (loginMsg.contains("최근")) {
+
+                       if (check_login.isChecked()){
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("user_id", email);
+                            editor.putString("user_nikname", nikname);
+                            editor.putString("user_idx",user_idx);
+                            editor.putString("access","ok");
+                            editor.commit();
+                        }else{
+                            SharedPreferences.Editor editor = pref.edit();
+                            editor.putString("user_id", email);
+                            editor.putString("user_nikname", nikname);
+                            editor.putString("user_idx",user_idx);
+                            editor.commit();
+                        }
+
+                        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
 
-            }catch (Exception e){
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
 
-            }
-            return receiveMsg;
+                }
+            });
         }
+    }
+
+    class Task extends AsyncTask<String,Void,Void> {
 
         @Override
-        protected void onPostExecute(String s) {
-            Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT).show();
-            if (s.contains("최근")){
-
-                if (check_login.isChecked()){
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putString("user_id", email);
-                    editor.putString("user_nikname", nikname);
-                    editor.putString("user_idx",user_idx);
-                    editor.putString("access","ok");
-                    editor.commit();
-                }else{
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putString("user_id", email);
-                    editor.putString("user_nikname", nikname);
-                    editor.putString("user_idx",user_idx);
-                    editor.commit();
-                }
-
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        protected Void doInBackground(String... strings) {
+            login(strings[0],strings[1]);
+            return null;
         }
     }
 }

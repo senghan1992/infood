@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +82,6 @@ public class HomeFragment extends Fragment {
                 //서버연결
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
-
                 OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
 
                 //서버로 전달할 내용
@@ -92,12 +90,6 @@ public class HomeFragment extends Fragment {
                 //서버로 값 전송
                 osw.write(sendMsg);
                 osw.flush();
-
-                //서버로 값 전송이 완료되면 서버에서 처리한 결과를 받는다
-                //getResponseCode() : 200 -> 정상
-                //getResponseCode() : 404,500 -> 비정상
-
-                Log.e("서버전송코드",conn.getResponseCode()+"");
 
                 if (conn.getResponseCode() == conn.HTTP_OK) {
                     InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "utf-8");
