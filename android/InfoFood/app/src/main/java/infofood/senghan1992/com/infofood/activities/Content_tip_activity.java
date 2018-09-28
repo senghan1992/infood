@@ -133,14 +133,15 @@ public class Content_tip_activity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             String this_content = contents[count].getText().toString();
-            if(!this_content.isEmpty()){
+            if(!this_content.isEmpty()&&(contentInfo.size()-1 == count)){
                 tip_nextbtns[count].setVisibility(View.GONE);
                 content_tips.add(this_content);
                 count += 1;
                 Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
                 layouts[count].setVisibility(View.VISIBLE);
             }else{
-                Toast.makeText(getApplicationContext(),"팁에 대해 설명 부탁드려요",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"추가 하시려면 팁에 대한\n자세한 설명 혹은 사진 부탁드려요",Toast.LENGTH_SHORT)
+                        .show();
             }
         }
     };
@@ -151,6 +152,7 @@ public class Content_tip_activity extends AppCompatActivity {
         public void onClick(View v) {
             layouts[count].setVisibility(View.GONE);
             content_tips.remove(content_tips.size()-1);
+            contentInfo.remove(contentInfo.size()-1);
             count -= 1;
             Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
             tip_nextbtns[count].setVisibility(View.VISIBLE);
