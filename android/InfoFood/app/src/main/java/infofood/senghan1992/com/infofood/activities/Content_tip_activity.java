@@ -1,12 +1,14 @@
 package infofood.senghan1992.com.infofood.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -54,7 +57,6 @@ public class Content_tip_activity extends AppCompatActivity {
     String imageFilePath;
     Uri photoURI;
     ArrayList<TipVO> contentInfo;
-    ArrayList<Uri> photos;
     TipVO vo;
 
     @Override
@@ -65,7 +67,6 @@ public class Content_tip_activity extends AppCompatActivity {
         //사진들 및 팁에 대한 내용들 담을 리스트 초기화
         count = 0;
         contentInfo = new ArrayList<>();
-        photos = new ArrayList<>();
 
         //검색
         //content 하나당 레이아웃
@@ -135,12 +136,36 @@ public class Content_tip_activity extends AppCompatActivity {
         content_tip_upload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(photos.size()-1 != count || contents[count].getText().toString().isEmpty()){
-                    Toast.makeText(getApplicationContext(), "이미지나 설명을 잘 입력하셨는지\n확인해주세요2"
-                            , Toast.LENGTH_SHORT).show();
-                }else{
+                boolean isTrue = false;
+                for (int i = 0; i < 5; i++) {
+                    if (layouts[i].getVisibility() == View.VISIBLE) {
+                        Bitmap bitmap = ((BitmapDrawable) tip_images[i].getDrawable()).getBitmap();
+                        String content = contents[i].getText().toString().trim();
+                        if (bitmap == null || content.isEmpty()) {
+                            Toast.makeText(getApplicationContext(),
+                                    "이미지 혹은 내용을 입력해주세요", Toast.LENGTH_SHORT).show();
+                            isTrue = false;
+                            return;
+                        } else {
+                            isTrue = true;
+                        }
+                    }//if
+                }//for
+                if (isTrue) {
+                    for (int i=0;i<5;i++){
+                        if(layouts[i].getVisibility() == View.VISIBLE){
+                            Bitmap bitmap = ((BitmapDrawable) tip_images[i].getDrawable()).getBitmap();
+                            String content = contents[i].getText().toString().trim();
+                            vo = new TipVO();
+                            vo.setPhotoUri(getImageUri(Content_tip_activity.this,bitmap));
+                            vo.setContent(content);
+                            contentInfo.add(vo);
+                        }
+                    }//for
 
-                }
+
+
+                }//if(isTrue)
             }
         });
 
@@ -151,15 +176,9 @@ public class Content_tip_activity extends AppCompatActivity {
     View.OnClickListener clickNext = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String content = contents[count].getText().toString().trim();
-            if (!content.isEmpty() && photoURI != null) {
-                tip_nextbtns[count].setVisibility(View.GONE);
-                count += 1;
-                layouts[count].setVisibility(View.VISIBLE);
-            } else {
-                Toast.makeText(getApplicationContext(), "이미지나 설명을 잘 입력하셨는지\n확인해주세요"
-                        , Toast.LENGTH_SHORT).show();
-            }
+            tip_nextbtns[count].setVisibility(View.GONE);
+            count += 1;
+            layouts[count].setVisibility(View.VISIBLE);
         }
     };
 
@@ -305,7 +324,6 @@ public class Content_tip_activity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 tip_test.setImageBitmap(rotate(resized, exifDegree));
-                photos.add(photoURI);
             } else if (requestCode == GALLERY_REQUEST_CODE) {
                 //앨범에서 호출한경우 data는 이전인텐트(사진갤러리)에서 선택한 영역을 가져오게된다.
                 Bitmap resized = null;
@@ -332,11 +350,16 @@ public class Content_tip_activity extends AppCompatActivity {
 
                     }
                     tip_test.setImageBitmap(rotate(resized, exifDegree));
-                    photos.add(photoURI);
                 }
             }
         }
     }//onActivityResult()
 
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }//getImageUri
 
 }

@@ -24,4 +24,5 @@ public interface RetrofitService {
                                    @Query("user_nikname")String user_nikname,
                                    @Part MultipartBody.Part file);
 
+
 }
