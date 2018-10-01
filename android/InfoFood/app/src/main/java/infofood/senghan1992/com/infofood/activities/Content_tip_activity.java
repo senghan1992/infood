@@ -34,11 +34,10 @@ public class Content_tip_activity extends AppCompatActivity {
     LinearLayout[] layouts;
     ImageView[] tip_nextbtns;
     ImageView[] tip_cancelbtns;
+
     //ImageView[] tip_images;
     ImageView tip_img1, tip_img2, tip_img3, tip_img4, tip_img5, tip_test;
     EditText[] contents;
-
-    int image_num;
 
     AlertDialog.Builder dialog;
 
@@ -51,7 +50,6 @@ public class Content_tip_activity extends AppCompatActivity {
     //사진 다루는 변수
     String imageFilePath;
     Uri photoURI;
-    ArrayList<String> content_tips;
     ArrayList<TipVO> contentInfo;
     TipVO vo;
 
@@ -62,7 +60,6 @@ public class Content_tip_activity extends AppCompatActivity {
 
         //사진들 및 팁에 대한 내용들 담을 리스트 초기화
         count = 0;
-        content_tips = new ArrayList<>();
         contentInfo = new ArrayList<>();
 
         //검색
@@ -107,17 +104,6 @@ public class Content_tip_activity extends AppCompatActivity {
         tip_img4.setOnClickListener(clickImage);
         tip_img5.setOnClickListener(clickImage);
 
-        //content별 업로드 할 이미지
-        /*tip_images = new ImageView[5];
-        tip_images[0] = findViewById(R.id.tip_img1);
-        tip_images[1] = findViewById(R.id.tip_img2);
-        tip_images[2] = findViewById(R.id.tip_img3);
-        tip_images[3] = findViewById(R.id.tip_img4);
-        tip_images[4] = findViewById(R.id.tip_img5);
-        for(ImageView tmp : tip_images){
-            tmp.setOnClickListener(clickImage);
-        }*/
-
         //content 별 edittext
         contents = new EditText[5];
         contents[0] = findViewById(R.id.tip_content1);
@@ -132,16 +118,17 @@ public class Content_tip_activity extends AppCompatActivity {
     View.OnClickListener clickNext = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            String this_content = contents[count].getText().toString();
-            if(!this_content.isEmpty()&&(contentInfo.size()-1 == count)){
+            String content = contents[count].getText().toString().trim();
+            if(!content.isEmpty()&&photoURI != null){
+                vo = new TipVO();
+                vo.setPhotoUri(photoURI);
+                vo.setContent(content);
+                contentInfo.add(vo);
                 tip_nextbtns[count].setVisibility(View.GONE);
-                content_tips.add(this_content);
                 count += 1;
-                Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
                 layouts[count].setVisibility(View.VISIBLE);
             }else{
-                Toast.makeText(getApplicationContext(),"추가 하시려면 팁에 대한\n자세한 설명 혹은 사진 부탁드려요",Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(getApplicationContext(),"이미지 또는 설명을 잘 적으셨나\n확인해주세요!",Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -151,10 +138,7 @@ public class Content_tip_activity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             layouts[count].setVisibility(View.GONE);
-            content_tips.remove(content_tips.size()-1);
-            contentInfo.remove(contentInfo.size()-1);
             count -= 1;
-            Toast.makeText(getApplicationContext(), count + "", Toast.LENGTH_SHORT).show();
             tip_nextbtns[count].setVisibility(View.VISIBLE);
         }
     };
@@ -271,7 +255,6 @@ public class Content_tip_activity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            vo = new TipVO();
             if (requestCode == CAMERA_REQUEST_CODE) {
                 Bitmap resized = null;
                 ExifInterface exif = null;
@@ -292,10 +275,7 @@ public class Content_tip_activity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 tip_test.setImageBitmap(rotate(resized, exifDegree));
-                vo.setPhotoUri(photoURI);
-                vo.setPhotoPath(imageFilePath);
-                contentInfo.add(vo);
-                Toast.makeText(getApplicationContext(),contentInfo.size()+"",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), contentInfo.size() + "", Toast.LENGTH_SHORT).show();
             } else if (requestCode == GALLERY_REQUEST_CODE) {
                 //앨범에서 호출한경우 data는 이전인텐트(사진갤러리)에서 선택한 영역을 가져오게된다.
                 Bitmap resized = null;
@@ -322,10 +302,7 @@ public class Content_tip_activity extends AppCompatActivity {
 
                     }
                     tip_test.setImageBitmap(rotate(resized, exifDegree));
-                    vo.setPhotoUri(photoURI);
-                    vo.setPhotoPath(imageFilePath);
-                    contentInfo.add(vo);
-                    Toast.makeText(getApplicationContext(),contentInfo.size()+"",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), contentInfo.size() + "", Toast.LENGTH_SHORT).show();
                 }
             }
         }

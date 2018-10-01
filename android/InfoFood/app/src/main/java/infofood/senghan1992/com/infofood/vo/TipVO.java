@@ -4,8 +4,7 @@ import android.net.Uri;
 
 public class TipVO {
     Uri photoUri;
-    String photoPath;
-    String contents;
+    String content;
 
     public Uri getPhotoUri() {
         return photoUri;
@@ -15,19 +14,11 @@ public class TipVO {
         this.photoUri = photoUri;
     }
 
-    public String getPhotoPath() {
-        return photoPath;
+    public String getContent() {
+        return content;
     }
 
-    public void setPhotoPath(String photoPath) {
-        this.photoPath = photoPath;
-    }
-
-    public String getContents() {
-        return contents;
-    }
-
-    public void setContents(String contents) {
-        this.contents = contents;
+    public void setContent(String content) {
+        this.content = content;
     }
 }
