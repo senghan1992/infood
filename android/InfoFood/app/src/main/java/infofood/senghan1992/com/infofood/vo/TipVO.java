@@ -4,7 +4,15 @@ import android.net.Uri;
 
 public class TipVO {
     Uri photoUri;
-    String content;
+    String content, imagePath;
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public Uri getPhotoUri() {
         return photoUri;

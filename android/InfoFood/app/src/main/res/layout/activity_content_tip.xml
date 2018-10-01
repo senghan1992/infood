@@ -246,6 +246,7 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/content_tip_upload_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="업로드"
